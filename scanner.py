@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 from datetime import datetime, timedelta
-from bist100 import BIST100_TICKERS
+from bist_tickers import BIST_TICKERS
 
 def calculate_bbawe(df: pd.DataFrame,
                     bb_length: int = 20,
@@ -64,17 +64,17 @@ def scan_bist100(timeframe: str):
         period = '60d'
     
     # Yfinance üzerinden çoklu veri çekimi
-    tickers_str = " ".join(BIST100_TICKERS)
-    print(f"[{datetime.now()}] {len(BIST100_TICKERS)} hisse için veri çekiliyor ({interval})...")
+    tickers_str = " ".join(BIST_TICKERS)
+    print(f"[{datetime.now()}] {len(BIST_TICKERS)} hisse için veri çekiliyor ({interval})...")
     
     try:
-        data = yf.download(tickers_str, period=period, interval=interval, progress=False, group_by='ticker')
+        data = yf.download(tickers_str, period=period, interval=interval, progress=False, group_by='ticker', threads=5)
     except Exception as e:
         return {"error": str(e)}
         
     blue_cloud_stocks = []
     
-    for ticker in BIST100_TICKERS:
+    for ticker in BIST_TICKERS:
         try:
             if ticker in data.columns.levels[0]:
                 df = data[ticker].dropna()
@@ -123,6 +123,6 @@ def scan_bist100(timeframe: str):
     
     return {
         "count": len(blue_cloud_stocks),
-        "total_scanned": len(BIST100_TICKERS),
+        "total_scanned": len(BIST_TICKERS),
         "stocks": blue_cloud_stocks
     }
