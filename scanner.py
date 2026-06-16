@@ -76,7 +76,7 @@ def scan_bist100(timeframe: str, chunk: str = "all"):
     print(f"[{datetime.now()}] {len(target_tickers)} hisse için veri çekiliyor ({interval}, aralık: {chunk})...")
     
     try:
-        data = yf.download(tickers_str, period=period, interval=interval, progress=False, group_by='ticker', threads=False)
+        data = yf.download(tickers_str, period=period, interval=interval, progress=False, group_by='ticker', threads=True)
         
         # Eğer veri boş dönerse (Yahoo IP'yi geçici engellemişse)
         if data.empty:

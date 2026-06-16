@@ -1,3 +1,4 @@
+# pyrefly: ignore [missing-import]
 from flask import Flask, render_template, request, jsonify
 from scanner import scan_bist100
 
