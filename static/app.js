@@ -49,6 +49,9 @@ $(document).ready(function() {
                                             <span class="squeeze-value" title="Sıkışma Oranı (Ne kadar düşükse o kadar sıkışık)">
                                                 <i class="fas fa-compress-alt me-1"></i> %${stock.squeeze.toFixed(1)}
                                             </span>
+                                            <a href="https://www.tradingview.com/chart/?symbol=BIST%3A${stock.symbol}" target="_blank" class="btn btn-sm btn-outline-info rounded-pill px-3">
+                                                <i class="fas fa-chart-line me-1"></i>Grafik
+                                            </a>
                                         </div>
                                     </div>
                                 </div>

@@ -11,7 +11,7 @@ def calculate_bbawe(df: pd.DataFrame,
                     ao_slow: int = 34,
                     ao_fast: int = 5,
                     sqz_length: int = 100,
-                    sqz_threshold: int = 50,
+                    sqz_threshold: int = 40,
                     bb_use_ema: bool = False) -> pd.DataFrame:
     """BBAWE indikatörünün tek bir hisse verisi için hesaplanması."""
     df = df.copy()
