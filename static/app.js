@@ -72,4 +72,38 @@ $(document).ready(function() {
             }
         });
     });
+
+    // PWA Kurulum Butonu Mantığı
+    let deferredPrompt;
+    const installBtn = $('#installPwaBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Tarayıcının kendi otomatik kurulum uyarısını engelle
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Butonu görünür yap
+        installBtn.removeClass('d-none');
+    });
+
+    installBtn.click(async () => {
+        if (deferredPrompt) {
+            // Kurulum penceresini göster
+            deferredPrompt.prompt();
+            
+            // Kullanıcının kararını bekle
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                installBtn.addClass('d-none');
+            }
+            deferredPrompt = null;
+        }
+    });
+
+    // Zaten kuruluysa butonu gizle (opsiyonel güvenlik önlemi)
+    window.addEventListener('appinstalled', () => {
+        installBtn.addClass('d-none');
+        deferredPrompt = null;
+    });
 });
