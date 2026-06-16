@@ -75,25 +75,29 @@ def scan_bist100(timeframe: str, chunk: str = "all"):
     tickers_str = " ".join(target_tickers)
     print(f"[{datetime.now()}] {len(target_tickers)} hisse için veri çekiliyor ({interval}, aralık: {chunk})...")
     
-    import requests
-    session = requests.Session()
-    session.headers.update({
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
-    })
-    
     try:
-        data = yf.download(tickers_str, period=period, interval=interval, progress=False, group_by='ticker', threads=5, session=session)
+        data = yf.download(tickers_str, period=period, interval=interval, progress=False, group_by='ticker', threads=5)
+        
+        # Eğer veri boş dönerse (Yahoo IP'yi geçici engellemişse)
+        if data.empty:
+            return {"error": "Yahoo Finance veri vermeyi reddetti (Rate Limit veya IP Engeli). Lütfen birkaç dakika bekleyin veya daha az hisse seçin."}
+            
     except Exception as e:
-        return {"error": str(e)}
+        return {"error": f"Veri çekme hatası: {str(e)}"}
         
     blue_cloud_stocks = []
     
     for ticker in target_tickers:
         try:
-            if ticker in data.columns.levels[0]:
-                df = data[ticker].dropna()
+            # MultiIndex kontrolü (eğer sadece 1 hisse seçilirse MultiIndex dönmeyebilir)
+            if isinstance(data.columns, pd.MultiIndex):
+                if ticker in data.columns.levels[0]:
+                    df = data[ticker].dropna()
+                else:
+                    continue
             else:
-                df = data.dropna() # Sadece 1 hisse geldiyse (genelde group_by ile MultiIndex gelir ama yine de önlem)
+                # Sadece 1 hisse geldiyse
+                df = data.dropna()
                 
             if len(df) < 100:
                 continue
