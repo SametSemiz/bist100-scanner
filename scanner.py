@@ -53,22 +53,27 @@ def scan_bist100(timeframe: str):
     # Yfinance için periyot ve interval ayarlaması
     if timeframe == '1h':
         interval = '1h'
-        period = '60d'
+        period = '15d'  # 60d yerine 15d (Hızlandırma için sadece gereken kadar)
     elif timeframe == '1d':
         interval = '1d'
         period = '1y'
     else:
-        # 2h ve 4h doğrudan yfinance tarafından desteklenmiyor olabilir, 1h indirip resample yapmamız gerekir
-        # Basitlik için desteklenen periyotlara zorluyoruz
+        # 2h ve 4h için 1h verisi alıp birleştireceğiz
         interval = '1h'
-        period = '60d'
+        period = '1mo'  # 1 ay yeterli (2h/4h için ~100 mum elde etmek için)
     
     # Yfinance üzerinden çoklu veri çekimi
     tickers_str = " ".join(BIST_TICKERS)
     print(f"[{datetime.now()}] {len(BIST_TICKERS)} hisse için veri çekiliyor ({interval})...")
     
+    import requests
+    session = requests.Session()
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
+    })
+    
     try:
-        data = yf.download(tickers_str, period=period, interval=interval, progress=False, group_by='ticker', threads=5)
+        data = yf.download(tickers_str, period=period, interval=interval, progress=False, group_by='ticker', threads=5, session=session)
     except Exception as e:
         return {"error": str(e)}
         
