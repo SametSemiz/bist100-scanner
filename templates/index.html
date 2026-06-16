@@ -24,8 +24,8 @@
                 <div class="control-panel p-4 rounded-4 shadow">
                     <div class="row align-items-end">
                         <div class="col-md-8">
-                            <label class="form-label text-light fw-semibold mb-3">Zaman Aralığı Seçin</label>
-                            <div class="timeframe-selector d-flex gap-2">
+                            <label class="form-label text-light fw-semibold mb-3">Zaman Aralığı</label>
+                            <div class="timeframe-selector d-flex gap-2 mb-4">
                                 <input type="radio" class="btn-check" name="timeframe" id="tf_1h" value="1h" autocomplete="off" checked>
                                 <label class="btn btn-outline-primary flex-fill" for="tf_1h">1 Saat</label>
 
@@ -38,8 +38,19 @@
                                 <input type="radio" class="btn-check" name="timeframe" id="tf_1d" value="1d" autocomplete="off">
                                 <label class="btn btn-outline-primary flex-fill" for="tf_1d">1 Gün</label>
                             </div>
+                            
+                            <label class="form-label text-light fw-semibold mb-3">Tarama Aralığı (Hisse Sırası)</label>
+                            <select id="chunkSelect" class="form-select bg-dark text-light border-secondary">
+                                <option value="all">Tüm Hisseler (~611 Hisse)</option>
+                                <option value="0-100">1 - 100 Arası</option>
+                                <option value="100-200">101 - 200 Arası</option>
+                                <option value="200-300">201 - 300 Arası</option>
+                                <option value="300-400">301 - 400 Arası</option>
+                                <option value="400-500">401 - 500 Arası</option>
+                                <option value="500-611">501 - 611 Arası</option>
+                            </select>
                         </div>
-                        <div class="col-md-4 mt-3 mt-md-0">
+                        <div class="col-md-4 mt-4 mt-md-0 d-flex align-items-end">
                             <button id="scanBtn" class="btn btn-primary btn-lg w-100 scan-btn">
                                 <span class="spinner-border spinner-border-sm d-none me-2" role="status" aria-hidden="true"></span>
                                 <i class="fas fa-search me-2"></i>Taramayı Başlat

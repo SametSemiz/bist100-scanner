@@ -6,6 +6,7 @@ $(document).ready(function() {
         const stockCards = $('#stockCards');
         const scanStats = $('#scanStats');
         const timeframe = $('input[name="timeframe"]:checked').val();
+        const chunk = $('#chunkSelect').val();
 
         // UI Durumunu Güncelle
         btn.prop('disabled', true);
@@ -17,7 +18,7 @@ $(document).ready(function() {
             url: '/scan',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ timeframe: timeframe }),
+            data: JSON.stringify({ timeframe: timeframe, chunk: chunk }),
             success: function(response) {
                 if (response.status === 'success') {
                     const data = response.data;

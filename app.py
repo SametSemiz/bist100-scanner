@@ -12,8 +12,9 @@ def run_scan():
     try:
         data = request.json
         timeframe = data.get('timeframe', '1d')
+        chunk = data.get('chunk', 'all')
         
-        results = scan_bist100(timeframe)
+        results = scan_bist100(timeframe, chunk)
         
         if "error" in results:
             return jsonify({"status": "error", "message": results["error"]}), 500

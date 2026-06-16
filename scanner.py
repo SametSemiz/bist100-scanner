@@ -28,7 +28,7 @@ def calculate_bbawe(df: pd.DataFrame,
         df['bb_basis'] = df['Close'].rolling(window=bb_length).mean()
 
     # Bollinger Bands
-    df['dev'] = df['Close'].rolling(window=bb_length).std()
+    df['dev'] = df['Close'].rolling(window=bb_length).std(ddof=0)
     df['bb_upper'] = df['bb_basis'] + bb_mult * df['dev']
     df['bb_lower'] = df['bb_basis'] - bb_mult * df['dev']
 
@@ -48,23 +48,32 @@ def calculate_bbawe(df: pd.DataFrame,
 
     return df
 
-def scan_bist100(timeframe: str):
-    """Tüm BIST100 hisselerini çeker ve Mavi Bulut (Squeeze) şartını sağlayanları döndürür."""
+def scan_bist100(timeframe: str, chunk: str = "all"):
+    """Tüm BIST hisselerini çeker ve Mavi Bulut (Squeeze) şartını sağlayanları döndürür."""
     # Yfinance için periyot ve interval ayarlaması
     if timeframe == '1h':
         interval = '1h'
-        period = '15d'  # 60d yerine 15d (Hızlandırma için sadece gereken kadar)
+        period = '3mo'  # 100 mum hesaplayabilmesi için yeterli geçmiş (Squeeze hesabı için gerekli)
     elif timeframe == '1d':
         interval = '1d'
         period = '1y'
     else:
         # 2h ve 4h için 1h verisi alıp birleştireceğiz
         interval = '1h'
-        period = '1mo'  # 1 ay yeterli (2h/4h için ~100 mum elde etmek için)
+        period = '3mo'
     
+    # Chunk mantığı (Sadece seçilen aralıktaki hisseleri filtrele)
+    target_tickers = BIST_TICKERS
+    if chunk != "all":
+        try:
+            start_idx, end_idx = map(int, chunk.split("-"))
+            target_tickers = BIST_TICKERS[start_idx:end_idx]
+        except Exception:
+            pass
+
     # Yfinance üzerinden çoklu veri çekimi
-    tickers_str = " ".join(BIST_TICKERS)
-    print(f"[{datetime.now()}] {len(BIST_TICKERS)} hisse için veri çekiliyor ({interval})...")
+    tickers_str = " ".join(target_tickers)
+    print(f"[{datetime.now()}] {len(target_tickers)} hisse için veri çekiliyor ({interval}, aralık: {chunk})...")
     
     import requests
     session = requests.Session()
@@ -79,7 +88,7 @@ def scan_bist100(timeframe: str):
         
     blue_cloud_stocks = []
     
-    for ticker in BIST_TICKERS:
+    for ticker in target_tickers:
         try:
             if ticker in data.columns.levels[0]:
                 df = data[ticker].dropna()
@@ -128,6 +137,6 @@ def scan_bist100(timeframe: str):
     
     return {
         "count": len(blue_cloud_stocks),
-        "total_scanned": len(BIST_TICKERS),
+        "total_scanned": len(target_tickers),
         "stocks": blue_cloud_stocks
     }
