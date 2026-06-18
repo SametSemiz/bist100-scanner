@@ -48,7 +48,7 @@ def calculate_bbawe(df: pd.DataFrame,
 
     return df
 
-def scan_bist100(timeframe: str, chunk: str = "all"):
+def scan_bist100(timeframe: str, chunk: str = "all", selected_tickers: list = None):
     """Tüm BIST hisselerini çeker ve Mavi Bulut (Squeeze) şartını sağlayanları döndürür."""
     # Yfinance için periyot ve interval ayarlaması
     if timeframe == '1h':
@@ -62,9 +62,11 @@ def scan_bist100(timeframe: str, chunk: str = "all"):
         interval = '1h'
         period = '3mo'
     
-    # Chunk mantığı (Sadece seçilen aralıktaki hisseleri filtrele)
+    # Chunk mantığı veya Seçili Hisseler
     target_tickers = BIST_TICKERS
-    if chunk != "all":
+    if selected_tickers and len(selected_tickers) > 0:
+        target_tickers = [t + ".IS" for t in selected_tickers]
+    elif chunk != "all":
         try:
             start_idx, end_idx = map(int, chunk.split("-"))
             target_tickers = BIST_TICKERS[start_idx:end_idx]

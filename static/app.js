@@ -1,4 +1,81 @@
 $(document).ready(function() {
+    let allTickers = [];
+    let selectedStocks = [];
+
+    // Ticker listesini çek
+    $.get('/tickers', function(data) {
+        allTickers = data;
+    });
+
+    const searchInput = $('#searchInput');
+    const searchSuggestions = $('#searchSuggestions');
+    const selectedStocksContainer = $('#selectedStocksContainer');
+    const chunkSelect = $('#chunkSelect');
+
+    function updateUIState() {
+        // Tagleri çiz
+        selectedStocksContainer.empty();
+        selectedStocks.forEach(stock => {
+            const tag = `
+                <span class="badge bg-primary d-flex align-items-center p-2 fs-6">
+                    ${stock}
+                    <i class="fas fa-times ms-2 remove-stock" style="cursor:pointer;" data-stock="${stock}"></i>
+                </span>
+            `;
+            selectedStocksContainer.append(tag);
+        });
+
+        // Eğer seçili hisse varsa tarama aralığını (chunkSelect) devre dışı bırak
+        if (selectedStocks.length > 0) {
+            chunkSelect.prop('disabled', true);
+        } else {
+            chunkSelect.prop('disabled', false);
+        }
+    }
+
+    searchInput.on('input', function() {
+        const val = $(this).val().trim().toUpperCase();
+        searchSuggestions.empty();
+
+        if (val.length > 0) {
+            const filtered = allTickers.filter(t => t.startsWith(val) && !selectedStocks.includes(t));
+            if (filtered.length > 0) {
+                filtered.slice(0, 10).forEach(stock => {
+                    searchSuggestions.append(`<li class="list-group-item list-group-item-action bg-dark text-light border-secondary" style="cursor:pointer;">${stock}</li>`);
+                });
+                searchSuggestions.removeClass('d-none');
+            } else {
+                searchSuggestions.addClass('d-none');
+            }
+        } else {
+            searchSuggestions.addClass('d-none');
+        }
+    });
+
+    searchSuggestions.on('click', 'li', function() {
+        const stock = $(this).text();
+        if (!selectedStocks.includes(stock)) {
+            selectedStocks.push(stock);
+            updateUIState();
+        }
+        searchInput.val('');
+        searchSuggestions.addClass('d-none');
+        searchInput.focus();
+    });
+
+    selectedStocksContainer.on('click', '.remove-stock', function() {
+        const stock = $(this).data('stock');
+        selectedStocks = selectedStocks.filter(s => s !== stock);
+        updateUIState();
+    });
+
+    // Tıklama dışarıya olunca suggestionları kapat
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#searchInput').length && !$(e.target).closest('#searchSuggestions').length) {
+            searchSuggestions.addClass('d-none');
+        }
+    });
+
     $('#scanBtn').click(function() {
         const btn = $(this);
         const spinner = $('#runSpinner');
@@ -6,7 +83,7 @@ $(document).ready(function() {
         const stockCards = $('#stockCards');
         const scanStats = $('#scanStats');
         const timeframe = $('input[name="timeframe"]:checked').val();
-        const chunk = $('#chunkSelect').val();
+        const chunk = chunkSelect.val();
 
         // UI Durumunu Güncelle
         btn.prop('disabled', true);
@@ -18,7 +95,7 @@ $(document).ready(function() {
             url: '/scan',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ timeframe: timeframe, chunk: chunk }),
+            data: JSON.stringify({ timeframe: timeframe, chunk: chunk, selected_tickers: selectedStocks }),
             success: function(response) {
                 if (response.status === 'success') {
                     const data = response.data;
