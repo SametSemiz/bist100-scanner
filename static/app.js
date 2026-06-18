@@ -154,36 +154,55 @@ $(document).ready(function() {
     });
 
     // PWA Kurulum Butonu Mantığı
-    let deferredPrompt;
     const installBtn = $('#installPwaBtn');
+    
+    // iOS Kontrolü
+    const isIos = () => {
+        const userAgent = window.navigator.userAgent.toLowerCase();
+        return /iphone|ipad|ipod/.test(userAgent);
+    };
+    // standalone özelliği uygulamanın zaten ana ekranda çalışıp çalışmadığını kontrol eder
+    const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-        // Tarayıcının kendi otomatik kurulum uyarısını engelle
-        e.preventDefault();
-        deferredPrompt = e;
-        
-        // Butonu görünür yap
+    if (isIos() && !isStandalone) {
+        // iOS için özel buton ve uyarı
         installBtn.removeClass('d-none');
-    });
+        installBtn.html('<i class="fab fa-apple me-2"></i>iPhone\\'a Yükle');
+        installBtn.click(() => {
+            alert("iPhone'a yüklemek için:\n\n1. Safari'nin alt kısmındaki 'Paylaş' (kare ve yukarı ok) ikonuna dokunun.\n2. Açılan menüden 'Ana Ekrana Ekle' (Add to Home Screen) seçeneğini seçip ekleyin.");
+        });
+    } else {
+        // Android ve diğer cihazlar için standart PWA kurulumu
+        let deferredPrompt;
 
-    installBtn.click(async () => {
-        if (deferredPrompt) {
-            // Kurulum penceresini göster
-            deferredPrompt.prompt();
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Tarayıcının kendi otomatik kurulum uyarısını engelle
+            e.preventDefault();
+            deferredPrompt = e;
             
-            // Kullanıcının kararını bekle
-            const { outcome } = await deferredPrompt.userChoice;
-            
-            if (outcome === 'accepted') {
-                installBtn.addClass('d-none');
+            // Butonu görünür yap
+            installBtn.removeClass('d-none');
+        });
+
+        installBtn.click(async () => {
+            if (deferredPrompt) {
+                // Kurulum penceresini göster
+                deferredPrompt.prompt();
+                
+                // Kullanıcının kararını bekle
+                const { outcome } = await deferredPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    installBtn.addClass('d-none');
+                }
+                deferredPrompt = null;
             }
-            deferredPrompt = null;
-        }
-    });
+        });
 
-    // Zaten kuruluysa butonu gizle (opsiyonel güvenlik önlemi)
-    window.addEventListener('appinstalled', () => {
-        installBtn.addClass('d-none');
-        deferredPrompt = null;
-    });
+        // Zaten kuruluysa butonu gizle
+        window.addEventListener('appinstalled', () => {
+            installBtn.addClass('d-none');
+            deferredPrompt = null;
+        });
+    }
 });
