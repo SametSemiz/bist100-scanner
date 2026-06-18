@@ -167,7 +167,7 @@ $(document).ready(function() {
     if (isIos() && !isStandalone) {
         // iOS için özel buton ve uyarı
         installBtn.removeClass('d-none');
-        installBtn.html('<i class="fab fa-apple me-2"></i>iPhone\\'a Yükle');
+        installBtn.html("<i class='fab fa-apple me-2'></i>iPhone'a Yükle");
         installBtn.click(() => {
             alert("iPhone'a yüklemek için:\n\n1. Safari'nin alt kısmındaki 'Paylaş' (kare ve yukarı ok) ikonuna dokunun.\n2. Açılan menüden 'Ana Ekrana Ekle' (Add to Home Screen) seçeneğini seçip ekleyin.");
         });
