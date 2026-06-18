@@ -104,9 +104,9 @@ $(document).ready(function() {
                     if (data.count === 0) {
                         stockCards.html(`
                             <div class="col-12 text-center py-5">
-                                <i class="fas fa-search-minus fa-3x text-muted mb-3"></i>
+                                <i class="fas fa-search-minus fa-3x text-light mb-3"></i>
                                 <h4 class="text-light">Eşleşen Hisse Bulunamadı</h4>
-                                <p class="text-muted">Seçilen zaman aralığında mavi bulut formasyonunda (Squeeze) olan hisse senedi yok.</p>
+                                <p class="text-light">Seçilen zaman aralığında mavi bulut formasyonunda (Squeeze) olan hisse senedi yok.</p>
                             </div>
                         `);
                     } else {
