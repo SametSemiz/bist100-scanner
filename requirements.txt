@@ -3,3 +3,6 @@ yfinance
 pandas
 numpy
 gunicorn
+pytz
+psycopg2-binary
+python-dotenv
